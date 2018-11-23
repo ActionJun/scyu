@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			*{
+				margin: 0;
+				padding: 0;
+			}
+			#info,#box,.add,.edit{
+				width: 400px;
+				height: 500px;
+				position: fixed;
+				top: 50px;
+				left: 50%;
+				margin-left: -200px;
+				border: 1px solid black;
+				background: skyblue;
+			}
+			table td{
+				width: 100px;
+				height: 100px;
+				text-align: center;
+			}
+			table img{
+				width: 100px;
+				height: 100px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>主页</h1>
+		<div>
+			
+			系统管理<button id="quit">退出系统</button><button id="look">查看用户信息</button><button id="passbtn">修改密码</button><button id="addbtn">添加商品</button>
+		</div>
+		<div id="box">
+			<h1>密码修改<span class="sp" style="color: red; float: right; cursor: pointer;">X</span></h1>
+			用户名：<input type="text" id="name" />
+			<br />
+			原密码：<input type="text" id="oldpass" />
+			<br />
+			新密码：<input type="text" id="newpass" />
+			<br />
+			<button id="mod">确认修改</button>
+			<br />
+		</div>
+		<div id="info">
+			<h1>用户信息<span class="sp" style="color: red; float: right; cursor: pointer;">X</span></h1>
+			用户名：<input type="text" id="ename" disabled="disabled"/>
+			<br />
+			真实姓名：<input type="text" id="trueName" disabled="disabled"/>
+			<br />
+			手机：<input type="text" id="phone" disabled="disabled"/>
+			<br />
+			用户特权：<input type="text" id="vip" disabled="disabled"/>
+			<br />
+			创建时间：<input type="text" id="date" disabled="disabled"/>
+			<br />
+			<button id="redact">编辑</button><button id="save">保存</button>
+		</div>
+		
+		<table border="1" id="table">
+			<thead>
+				<tr>
+				<th><input class="allcheck" type="checkbox" />全选</th>
+				<th>图片</th>
+				<th>名字</th>
+				<th>价格</th>
+				<th>颜色</th>
+				<th>尺码</th>
+				<th>库存</th>
+				<th>操作</th>
+				</tr>
+			</thead>
+			<tbody id="tbody">
+			<!--<tr>
+				<td><input type="checkbox" /></td>
+				<td><img src="1.png"/></td>
+				<td>奔驰</td>
+				<td>8888</td>
+				<td>红色</td>
+				<td>尺码</td>
+				<td>22</td>
+				<td><button>编辑</button><button>删除</button></td>
+			</tr>-->
+			</tbody>
+			<tfoot>
+				<tr>
+					<td colspan="7"></td>
+					<td><button class="allbtn">批量删除</button></td>
+				</tr>
+			</tfoot>
+		</table>
+		<div class="add">
+			<h1>添加商品<span class="sp" style="color: red; float: right; cursor: pointer;">X</span></h1>
+			名称：<input type="text" class="addname" />
+			<br />
+			价格：<input type="text" class="addprice" />
+			<br />
+			主图：<input type="text" class="addimg" />
+			<br />
+			尺码：<input type="checkbox" /><span>A级</span><input type="checkbox" /><span>B级</span><input type="checkbox" /><span>C级</span>
+			<br />
+			颜色：<input type="text" class="addcolor"/>
+			<br />
+			库存：<input type="number" class="addkucun" />
+			<br />
+			功率：<input type="text" class="addgonglv" />
+			<br />
+			大图：<input type="text" class="addbigimg" />
+			<br />
+			<button class="addbtn">确认添加</button>
+		</div>
+		<div class="edit">
+			<h1>编辑商品<span class="sp" style="color: red; float: right; cursor: pointer;">X</span></h1>
+			名称：<input type="text" class="editname" />
+			<br />
+			价格：<input type="text" class="editprice" />
+			<br />
+			主图：<input type="text" class="editimg" />
+			<br />
+			尺码：<input type="checkbox" /><span>A级</span><input type="checkbox" /><span>B级</span><input type="checkbox" /><span>C级</span>
+			<br />
+			颜色：<input type="text" class="editcolor"/>
+			<br />
+			库存：<input type="number" class="editkucun" />
+			<br />
+			<button class="saveedit">保存</button>
+		</div>
+	</body>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+		
+		
+			prolist();
+			$('#info').hide()
+			$('#box').hide()
+			$('.edit').hide()
+			$('.sp').click(function(){
+				$('#info').hide()
+				$('#box').hide()
+				$('.add').hide()
+				$('.edit').hide()
+				$('#info input').attr("disabled","disabled")
+			})
+			$('#passbtn').click(function(){
+				$('#box').show()
+			})
+			//退出登录
+			$("#quit").click(function(){
+				$.ajax({
+					type:"get",
+					url:"/users/Adminquit",
+					async:true,
+					dataType:"json",
+					data:{action:"quit"}
+				}).done(function(res){
+					console.log(res)
+					if(res.success){
+						alert("退出成功")
+						location.replace("login.html")
+					}else{
+						alert(res.err)
+						location.replace("login.html")
+					}
+				});
+			});
+			//密码修改
+			$('#mod').click(function(){
+				$.ajax({
+					type:"post",
+					url:"/users/Adminmod",
+					async:true,
+					data:{
+						action:"mod",
+						userName:$('#name').val(),
+						oldpassword:$('#oldpass').val(),
+						newpassword:$('#newpass').val(),
+					}
+				}).done(function(res){
+					alert(res)
+					$('#box').hide()
+				});
+			})
+			//查看个人信息
+			function info(){
+				$.ajax({
+					type:"post",
+					url:"/users/userinfo",
+					async:true,
+					dataType:"json",
+					data:{action:"look"}
+				}).done(function(res){
+					console.log(res)
+					$('#info').show(),
+					$('#ename').val(res[0].userName)
+					$('#trueName').val(res[0].turename)
+					$('#phone').val(res[0].phone)
+					$('#date').val(res[0].creatAt)
+					$('#vip').val(res[0].power)
+					
+				});
+			}
+			//编辑个人信息
+			$("#look").click(function(){
+				info()
+			})
+			$('#redact').click(function(){
+				$('input').removeAttr("disabled")
+			})
+			$('#save').click(function(){
+				$.ajax({
+					type:"post",
+					url:"/users/redact",
+					async:true,
+					data:{
+						action:"redact",
+						userName:$('#ename').val(),
+						turename:$('#trueName').val(),
+						power:$('#vip').val(),
+						phone:$('#phone').val(),
+						},
+					dataType:"json",
+				}).done(function(res){
+					console.log(res)
+					$('#ename').val(res[0].userName)
+					$('#trueName').val(res[0].turename)
+					$('#phone').val(res[0].phone)
+					$('#date').val(res[0].creatAt)
+					$('#vip').val(res[0].power)
+					
+					$('#info input').attr("disabled","disabled")
+				});
+			})
+			//添加商品
+			$('.add').hide()
+			$('#addbtn').click(function(){
+				$('.add').show()
+			})
+			$('.addbtn').click(function(){
+				var flag=true;
+				$.each($('.add input:text'), function(index,ele) {
+					if(ele.value==''){
+						flag=false;
+					}
+					
+				});
+				if(flag){
+					var size=[];
+					$.each($('.add input:checked'), function(index,ele) {
+						if(ele.checked==true){
+							size.push(ele.nextElementSibling.innerHTML)
+						}
+					});
+					console.log(size)
+					
+					Name=$('.addname').val()
+					var objs={
+						AddName:Name,
+					}
+					var obj={
+							pname:$('.addname').val(),
+							price:$('.addprice').val(),
+							imgsrc:$('.addimg').val(),
+							color:$('.addcolor').val(),
+							kucun:$('.addkucun').val(),
+							size:JSON.stringify(size),
+							bigimg:$('.addbigimg').val(),
+							gonglv:$('.addgonglv').val(),
+							
+						}
+					$.ajax({
+						type:"post",
+						url:"/product/addPro",
+						async:true,
+						data:obj,
+						dataType:"json"
+					}).done(function(res){
+						console.log(res)
+						prolist(objs)
+						//添加完成后输入框清空
+						$('.add').hide()
+						$('.add input').val('')
+						$('.add input:checked').attr('checked',false)
+					});
+					
+				}else{
+					alert('不能为空')
+				}
+			})
+			
+			//商品列表
+			function prolist(name){
+				
+			$.ajax({
+				type:"post",
+				url:"/product/prolist",
+				async:true,
+				data:name,
+				dataType:"json"
+			}).done(function(res){
+				console.log(res)
+				if(res.err){
+					$('tbody').html('')
+					$('tfoot').html('')
+					alert(res.err)
+				}else{
+					
+				var str='';
+				$.each(res, function(index,ele){
+				str+='<tr pid="'+ele.pid+'">'
+					+'<td><input type="checkbox" /></td>'
+					+'<td><img src="'+ele.imgsrc+'"/></td>'
+					+'<td>'+ele.pname+'</td>'
+					+'<td>'+ele.price+'</td>'
+					+'<td>'+ele.color+'</td>'
+					+'<td>'+JSON.parse(ele.size)+'</td>'
+					+'<td>'+ele.kucun+'</td>'
+					+'<td><button class="editbtn">编辑</button><button class="prodelbtn">删除</button></td>'
+					+'</tr>'
+					
+				});
+				tbody.innerHTML=str
+				
+				}
+//			删除商品
+			var pid='';
+			$('.prodelbtn').each(function(index,ele){
+				$(this).click(function(){
+				pid=$(this).parent().parent().attr('pid')
+				console.log($(this))
+//					var obj={
+//							pname:$(this).parent().parent().children().eq(2).html(),
+//							price:$(this).parent().parent().children().eq(3).html(),
+//							color:$(this).parent().parent().children().eq(4).html(),
+//					}
+					$.ajax({
+						type:"post",
+						url:"/product/prodel",
+						async:true,
+						data:{pid:pid},
+						dataType:"json"
+					}).done(function(res){
+						console.log(res)
+						alert(res.success)
+						prolist()
+					});
+				})
+			})
+			
+			//编辑商品
+			var oldpname='';
+			$('.editbtn').each(function(index,ele){
+				$(this).click(function(){
+					$('.edit').show()
+					$('.editname').val($(this).parent().parent().children().eq(2).html())
+					$('.editprice').val($(this).parent().parent().children().eq(3).html())
+					$('.editimg').val($(this).parent().parent().children().eq(1).children().eq(0).attr("src"))
+					$('.editcolor').val($(this).parent().parent().children().eq(4).html())
+					$('.editkucun').val($(this).parent().parent().children().eq(6).html())
+					pid=$(this).parent().parent().attr('pid')
+					oldpname=$(this).parent().parent().children().eq(2).html();
+					})
+				})
+				$('.saveedit').click(function(){
+					
+					var size=[];
+					$.each($('.edit input:checkbox'), function(index,ele) {
+						if(ele.checked==true){
+							size.push(ele.nextElementSibling.innerHTML)
+						}
+					});
+					var obj={
+//							oldpname:oldpname,
+							pid:pid,
+							pname:$('.editname').val(),
+							price:$('.editprice').val(),
+							color:$('.editcolor').val(),
+							imgsrc:$('.editimg').val(),
+							kucun:$('.editkucun').val(),
+							size:JSON.stringify(size),
+					}
+					$.ajax({
+						type:"post",
+						url:"/product/proedit",
+						async:true,
+						data:obj,
+						dataType:"json"
+					}).done(function(res){
+						console.log(res)
+						prolist()
+						$('.edit').hide()
+					});
+					
+				})
+				//批量删除
+					$('.allcheck').click(function(){
+						if(this.checked){
+							$('#tbody input:checkbox').attr("checked",true)
+						}else{
+							$('#tbody input:checkbox').attr("checked",false)
+						}
+					})
+					$("tbody input:checkbox").on('click', function() {
+                    //当选中的长度等于checkbox的长度的时候,就让控制全选反选的checkbox设置为选中,否则就为未选中
+                    if($("tbody input:checkbox").length === $("tbody input:checked").length) {
+                        $(".allcheck").prop("checked", true);
+                    } else {
+                        $(".allcheck").prop("checked", false);
+                    }
+                })
+					var pidarr=[]
+					$('.allbtn').click(function(){
+						var trlist=''
+						$('#tbody input:checked').each(function(index,ele){
+							pidarr.push($(this).parent().parent().attr('pid'))
+							$(this).parent().parent().remove();
+						})
+						$.ajax({
+							type:"post",
+							url:"/product/prodels",
+							async:true,
+							data:{objss:JSON.stringify(pidarr)},
+						}).done(function(res){
+							console.log('1')
+							
+						});
+						
+					})
+					
+					
+			
+			});
+			
+			
+			}
+		})
+	</script>
+</html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<h1>登录</h1>
+		用户名：<input type="text" id="name" />
+		<br />
+		密码：<input type="text" id="password" />
+		<div><input type="text" id="login"/>验证码：<span class="veri"><canvas id="canvas"></canvas></span></div>
+		<button id="btn">登录</button>
+	</body>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript" src="javascripts/code.js" ></script>
+	<script type="text/javascript">
+		
+//		接口文档
+//		url:"users/adminVeri?action=veri",
+//		type:"get",
+//		data:success:成功
+//			veri  验证码字符串
+		$(function(){
+
+		function getcode(){		
+		$.ajax({
+			type:"get",
+			url:"users/adminVeri?action=veri",
+			async:true,
+		}).done(function(res){
+			var resdata=JSON.parse(res);
+			console.log(resdata)
+//			$(".veri").html(resdata.veri);
+
+//			调取获取验证码函数
+			draw(resdata.veri)
+		})
+	}	
+	
+	getcode()//页面加载获取验证码
+	
+	//点击画布重新获取验证码
+	$("#canvas").click(function(){
+		getcode()
+	})
+	
+	
+		$("#btn").click(function(){
+			$.ajax({
+				type:"get",
+				url:"users/adminVeri",
+				data:{action:"checkVeri",veri:$('#login').val()},
+				async:true
+			}).done(function(res){
+				var resData=JSON.parse(res);
+				if(resData.success){
+					alert("验证码正确")
+					$.ajax({
+						type:"post",
+						url:"/users/LoginAndReg",
+						async:true,
+						data:{action:"login",userName:$("#name").val(),password:$('#password').val()}
+					}).done(function(res){
+						var resData=JSON.parse(res);
+						console.log(resData)
+						if(resData.success){
+							alert(resData.success)
+							location.href="home.html"
+							
+						}else if(resData.err){
+							alert(resData.err)
+						}
+					});
+				}else if(resData.err){
+					alert("验证码错误")
+				}
+			});
+		})
+		})
+	</script>
+</html>

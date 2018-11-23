@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+	</head>
+	<body>
+		<h1>注册</h1>
+		用户名：<input type="text" id="user" />
+		<br />
+		密码：<input type="text" id="password" />
+		<br />
+		手机：<input type="text" id="phone" />
+		<br />
+		真实姓名：<input type="text" id="tureName" />
+		<br />
+		<select id="mysel">
+			<option value="会员">会员</option>
+			<option value="非会员">非会员</option>
+			
+		</select>
+		<button id="regbtn">注册</button>
+	</body>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		$(function(){
+			
+			$("#regbtn").click(function(){
+				$.ajax({
+					type:"post",
+					url:"/users/LoginAndReg",
+					async:true,
+					data:{action:"reg",
+							power:$('#mysel').val(),
+							userName:$("#user").val(),
+							tureName:$("tureName").val(),
+							password:$("#password").val(),
+							phone:$("#phone").val(),
+					}
+				}).done(function(res){
+					console.log(res)
+				});
+			})
+		})
+	</script>
+</html>

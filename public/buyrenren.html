@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8">
+		<title></title>
+		<style type="text/css">
+			.search_wrap{
+				width: 500px;
+				height: 100px;
+				margin: 0 auto;
+			}
+			.list dl{
+				width: 300px;
+				height: 300px;
+				text-align: center;
+				background: skyblue;
+				float: left;
+				margin-left: 20px;
+				cursor: pointer;
+			}
+			.list dl img {
+				width: 300px;
+				height: 180px;
+			}
+		</style>
+	</head>
+	<body>
+		<h1>人人车登录</h1>
+		<div class="search_wrap">
+			<input type="text" id="search"  /><button id="searchBtn">搜索</button>
+		</div>
+		<div class="list_wrap">
+			<div class="screen">
+				<button>库存从高到低</button><button class="priceOrder">价格从高到低</button>
+			</div>
+			<div class="list">
+				<!--<dl>
+					<dt><img src="1.png"/></dt>
+					<dd>奔驰</dd>
+					<dd>$<span>888</span></dd>
+					<button>查看详情</button>
+				</dl>
+				<dl>
+					<dt><img src="1.png"/></dt>
+					<dd>奔驰</dd>
+					<dd>$<span>888</span></dd>
+					<button>查看详情</button>
+				</dl>-->
+			</div>
+		</div>
+	</body>
+	<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+	<script type="text/javascript">
+		
+				$(function(){
+					
+					function loadRenren(searchText,order){
+						var str=''
+						$.ajax({
+							type:"post",
+							url:"/renren/renrenList",
+							async:true,
+							data:{
+								searchText:searchText,
+								order:order
+							},
+							dataType:"json"
+						}).done(function(res){
+							console.log(res)
+							$.each(res, function(index,ele) {
+								
+							str+='<dl pid="'+ele.pid+'">'
+								+'<dt><img src="'+ele.imgsrc+'"/></dt>'
+								+'<dd>'+ele.pname+'</dd>'
+								+'<dd>$<span>'+ele.price+'</span></dd>'
+								+'<button onclick="location.href=\'renrenDetails.html?pid='+ele.pid+'\'">查看详情</button>'
+								+'</dl>'	
+								
+							});
+							console.log(str)
+							$('.list').html(str)
+						});
+					}
+					loadRenren();
+					var x=0
+					var searchText=null
+					$("#searchBtn").click(function(){
+//						console.log(/奔驰/g.test("奔驰911"));
+						searchText=$("#search").val();
+						loadRenren(searchText);
+					})
+					
+					$('.priceOrder').click(function(){
+						var order;
+						if(x%2==0){
+							order="down";
+						}else{
+							order="up";
+							
+						}
+						loadRenren(searchText,order);
+					})
+				})
+	</script>
+	
+</html>
